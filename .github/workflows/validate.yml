@@ -38,16 +38,20 @@ jobs:
       - name: Validate against schema
         run: |
           echo "Validating model definitions against schema..."
-          has_error=0
+          validation_failed=0
           find models -name "*.json" -type f -not -name "index.json" | while read file; do
             echo "Validating $file against schema"
-            if ajv validate -s schema/model.schema.json -d "$file" --strict=false 2>&1 | grep -q "invalid"; then
+            if ! ajv validate -s schema/model.schema.json -d "$file" --strict=false > /dev/null 2>&1; then
               echo "❌ Schema validation failed for $file"
-              ajv validate -s schema/model.schema.json -d "$file" --strict=false
-              has_error=1
+              ajv validate -s schema/model.schema.json -d "$file" --strict=false || true
+              validation_failed=1
+            else
+              echo "  ✓ Valid"
             fi
           done
-          if [ $has_error -eq 1 ]; then
+          # Check if any validation failed
+          if find models -name "*.json" -type f -not -name "index.json" -exec ajv validate -s schema/model.schema.json -d {} --strict=false \; 2>&1 | grep -q "invalid"; then
+            echo "❌ Some models failed schema validation"
             exit 1
           fi
           echo "✅ All models conform to schema"

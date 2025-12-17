@@ -57,21 +57,28 @@
         "freeQuota": {
           "type": "object",
           "description": "Free tier quota if applicable",
+          "required": ["period"],
           "properties": {
             "requests": {
               "type": "number",
-              "description": "Number of free requests per period"
+              "description": "Number of free requests per period",
+              "minimum": 0
             },
             "tokens": {
               "type": "number",
-              "description": "Number of free tokens per period"
+              "description": "Number of free tokens per period",
+              "minimum": 0
             },
             "period": {
               "type": "string",
               "enum": ["day", "week", "month", "year"],
               "description": "Time period for quota reset"
             }
-          }
+          },
+          "anyOf": [
+            { "required": ["requests"] },
+            { "required": ["tokens"] }
+          ]
         }
       }
     },

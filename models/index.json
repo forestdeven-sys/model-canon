@@ -1,5 +1,5 @@
 {
-  "$schema": "./schema/model.schema.json",
+  "$schema": "../schema/model.schema.json",
   "version": "1.0.0",
   "lastUpdated": "2024-12-17",
   "description": "Index of all models in the Model Canon",
