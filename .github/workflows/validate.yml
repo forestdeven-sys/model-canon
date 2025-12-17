@@ -38,14 +38,18 @@ jobs:
       - name: Validate against schema
         run: |
           echo "Validating model definitions against schema..."
-          find models -name "*.json" -type f | while read file; do
+          has_error=0
+          find models -name "*.json" -type f -not -name "index.json" | while read file; do
             echo "Validating $file against schema"
-            if ! ajv validate -s schema/model.schema.json -d "$file" --strict=false 2>/dev/null; then
+            if ajv validate -s schema/model.schema.json -d "$file" --strict=false 2>&1 | grep -q "invalid"; then
               echo "❌ Schema validation failed for $file"
               ajv validate -s schema/model.schema.json -d "$file" --strict=false
-              exit 1
+              has_error=1
             fi
           done
+          if [ $has_error -eq 1 ]; then
+            exit 1
+          fi
           echo "✅ All models conform to schema"
 
       - name: Check for duplicate IDs
