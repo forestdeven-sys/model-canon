@@ -10,6 +10,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     name: Validate Model JSON Files
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
