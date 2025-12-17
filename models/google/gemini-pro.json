@@ -1,0 +1,40 @@
+{
+  "id": "gemini-pro",
+  "name": "Gemini Pro",
+  "provider": "Google",
+  "availability": {
+    "status": "generally-available",
+    "regions": ["global"],
+    "lastUpdated": "2024-12-01"
+  },
+  "tier": {
+    "type": "freemium",
+    "freeQuota": {
+      "requests": 60,
+      "period": "month"
+    }
+  },
+  "pricing": {
+    "inputTokenPrice": 0.00025,
+    "outputTokenPrice": 0.0005,
+    "currency": "USD",
+    "unit": "per-1k-tokens",
+    "lastUpdated": "2024-12-01"
+  },
+  "usage": {
+    "intendedFor": ["chat", "completion", "code-generation", "analysis"],
+    "capabilities": {
+      "contextWindow": 32760,
+      "maxOutputTokens": 8192,
+      "supportsFunctionCalling": true,
+      "supportsVision": false,
+      "supportsStreaming": true
+    },
+    "restrictions": []
+  },
+  "metadata": {
+    "releaseDate": "2023-12-06",
+    "documentation": "https://ai.google.dev/models/gemini",
+    "notes": "Google's multimodal AI model with competitive pricing"
+  }
+}
