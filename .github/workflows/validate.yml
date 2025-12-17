@@ -1,0 +1,96 @@
+name: Validate Model Definitions
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Model JSON Files
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install -g ajv-cli ajv-formats
+
+      - name: Validate JSON syntax
+        run: |
+          echo "Validating JSON syntax for all model files..."
+          find models -name "*.json" -type f | while read file; do
+            echo "Checking $file"
+            if ! jq empty "$file" 2>/dev/null; then
+              echo "❌ Invalid JSON in $file"
+              exit 1
+            fi
+          done
+          echo "✅ All JSON files are valid"
+
+      - name: Validate against schema
+        run: |
+          echo "Validating model definitions against schema..."
+          validation_failed=0
+          find models -name "*.json" -type f -not -name "index.json" | while read file; do
+            echo "Validating $file against schema"
+            if ! ajv validate -s schema/model.schema.json -d "$file" --strict=false > /dev/null 2>&1; then
+              echo "❌ Schema validation failed for $file"
+              ajv validate -s schema/model.schema.json -d "$file" --strict=false || true
+              validation_failed=1
+            else
+              echo "  ✓ Valid"
+            fi
+          done
+          # Check if any validation failed
+          if find models -name "*.json" -type f -not -name "index.json" -exec ajv validate -s schema/model.schema.json -d {} --strict=false \; 2>&1 | grep -q "invalid"; then
+            echo "❌ Some models failed schema validation"
+            exit 1
+          fi
+          echo "✅ All models conform to schema"
+
+      - name: Check for duplicate IDs
+        run: |
+          echo "Checking for duplicate model IDs..."
+          ids=$(find models -name "*.json" -type f -exec jq -r '.id' {} \;)
+          duplicates=$(echo "$ids" | sort | uniq -d)
+          if [ -n "$duplicates" ]; then
+            echo "❌ Duplicate model IDs found:"
+            echo "$duplicates"
+            exit 1
+          fi
+          echo "✅ No duplicate IDs found"
+
+      - name: Verify required fields
+        run: |
+          echo "Verifying all models have required fields..."
+          find models -name "*.json" -type f | while read file; do
+            required_fields=("id" "name" "provider" "availability" "tier" "usage")
+            for field in "${required_fields[@]}"; do
+              if ! jq -e ".$field" "$file" >/dev/null 2>&1; then
+                echo "❌ Missing required field '$field' in $file"
+                exit 1
+              fi
+            done
+          done
+          echo "✅ All required fields present"
+
+      - name: Validation summary
+        run: |
+          model_count=$(find models -name "*.json" -type f | wc -l)
+          echo ""
+          echo "================================"
+          echo "✅ Validation Complete"
+          echo "================================"
+          echo "Total models validated: $model_count"
+          echo ""
+          echo "All model definitions are valid and conform to the schema."

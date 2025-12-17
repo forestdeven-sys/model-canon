@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/forestdeven-sys/model-canon/schema/model.schema.json",
+  "title": "AI Model Definition",
+  "description": "Schema for defining AI models in the Model Canon",
+  "type": "object",
+  "required": ["id", "name", "provider", "availability", "tier", "usage"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the model (e.g., 'gpt-4', 'claude-3-opus')",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable name of the model"
+    },
+    "provider": {
+      "type": "string",
+      "description": "Provider of the model (e.g., 'OpenAI', 'Anthropic', 'Google')"
+    },
+    "availability": {
+      "type": "object",
+      "description": "Availability information for the model",
+      "required": ["status", "regions"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["generally-available", "preview", "beta", "deprecated", "discontinued"],
+          "description": "Current availability status of the model"
+        },
+        "regions": {
+          "type": "array",
+          "description": "Geographic regions where the model is available",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when availability was last verified (YYYY-MM-DD)"
+        }
+      }
+    },
+    "tier": {
+      "type": "object",
+      "description": "Pricing tier information",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["free", "paid", "freemium"],
+          "description": "Whether the model is free, paid, or has a free tier"
+        },
+        "freeQuota": {
+          "type": "object",
+          "description": "Free tier quota if applicable",
+          "required": ["period"],
+          "properties": {
+            "requests": {
+              "type": "number",
+              "description": "Number of free requests per period",
+              "minimum": 0
+            },
+            "tokens": {
+              "type": "number",
+              "description": "Number of free tokens per period",
+              "minimum": 0
+            },
+            "period": {
+              "type": "string",
+              "enum": ["day", "week", "month", "year"],
+              "description": "Time period for quota reset"
+            }
+          },
+          "anyOf": [
+            { "required": ["requests"] },
+            { "required": ["tokens"] }
+          ]
+        }
+      }
+    },
+    "pricing": {
+      "type": "object",
+      "description": "Pricing information for the model",
+      "properties": {
+        "inputTokenPrice": {
+          "type": "number",
+          "description": "Price per input token in USD"
+        },
+        "outputTokenPrice": {
+          "type": "number",
+          "description": "Price per output token in USD"
+        },
+        "currency": {
+          "type": "string",
+          "default": "USD",
+          "description": "Currency for pricing"
+        },
+        "unit": {
+          "type": "string",
+          "default": "per-1k-tokens",
+          "description": "Unit for pricing (e.g., 'per-1k-tokens', 'per-1M-tokens')"
+        },
+        "lastUpdated": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when pricing was last verified (YYYY-MM-DD)"
+        }
+      }
+    },
+    "usage": {
+      "type": "object",
+      "description": "Intended usage and capabilities",
+      "required": ["intendedFor"],
+      "properties": {
+        "intendedFor": {
+          "type": "array",
+          "description": "Intended use cases for the model",
+          "items": {
+            "type": "string",
+            "enum": [
+              "chat",
+              "completion",
+              "code-generation",
+              "analysis",
+              "embedding",
+              "image-generation",
+              "image-understanding",
+              "audio-transcription",
+              "audio-generation",
+              "translation",
+              "summarization",
+              "search",
+              "classification",
+              "moderation"
+            ]
+          },
+          "minItems": 1
+        },
+        "capabilities": {
+          "type": "object",
+          "description": "Technical capabilities of the model",
+          "properties": {
+            "contextWindow": {
+              "type": "number",
+              "description": "Maximum context window in tokens"
+            },
+            "maxOutputTokens": {
+              "type": "number",
+              "description": "Maximum output tokens"
+            },
+            "supportsFunctionCalling": {
+              "type": "boolean",
+              "description": "Whether the model supports function calling"
+            },
+            "supportsVision": {
+              "type": "boolean",
+              "description": "Whether the model supports image inputs"
+            },
+            "supportsStreaming": {
+              "type": "boolean",
+              "description": "Whether the model supports streaming responses"
+            }
+          }
+        },
+        "restrictions": {
+          "type": "array",
+          "description": "Usage restrictions or limitations",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {
+        "releaseDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Date when the model was released (YYYY-MM-DD)"
+        },
+        "documentation": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to official documentation"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes or information"
+        }
+      }
+    }
+  }
+}

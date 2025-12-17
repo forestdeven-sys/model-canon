@@ -1,0 +1,36 @@
+{
+  "id": "claude-3-opus",
+  "name": "Claude 3 Opus",
+  "provider": "Anthropic",
+  "availability": {
+    "status": "generally-available",
+    "regions": ["global"],
+    "lastUpdated": "2024-12-01"
+  },
+  "tier": {
+    "type": "paid"
+  },
+  "pricing": {
+    "inputTokenPrice": 0.015,
+    "outputTokenPrice": 0.075,
+    "currency": "USD",
+    "unit": "per-1k-tokens",
+    "lastUpdated": "2024-12-01"
+  },
+  "usage": {
+    "intendedFor": ["chat", "completion", "code-generation", "analysis", "image-understanding"],
+    "capabilities": {
+      "contextWindow": 200000,
+      "maxOutputTokens": 4096,
+      "supportsFunctionCalling": true,
+      "supportsVision": true,
+      "supportsStreaming": true
+    },
+    "restrictions": []
+  },
+  "metadata": {
+    "releaseDate": "2024-03-04",
+    "documentation": "https://docs.anthropic.com/claude/docs/models-overview",
+    "notes": "Most capable Claude 3 model with strong performance across all tasks"
+  }
+}
